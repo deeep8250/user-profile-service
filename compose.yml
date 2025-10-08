@@ -1,0 +1,27 @@
+# For run docker compose file "docker compose up -d"
+
+services: 
+  db:
+    image: postgres:latest
+    environment:
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD: deep
+      POSTGRES_DB: appdb
+    ports:
+    - "5444:5432"
+    volumes:
+    - pgdata:/var/lib/postgresql/data
+
+
+  adminer:
+    image: adminer
+    ports:
+      - "8081:8080"
+    depends_on:
+      - db
+
+
+volumes:
+  pgdata:     
+
+
