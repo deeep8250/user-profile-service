@@ -8,9 +8,20 @@ import (
 	"database/sql"
 )
 
-type User struct {
-	ID        int32
-	Name      string
-	Email     string
+type Profile struct {
+	ID        int64
+	UserID    sql.NullInt64
+	AvatarUrl sql.NullString
+	Bio       sql.NullString
 	CreatedAt sql.NullTime
+	UpdatedAt sql.NullTime
+}
+
+type User struct {
+	ID        int64
+	Email     string
+	Name      string
+	Password  string
+	CreatedAt sql.NullTime
+	UpdatedAt sql.NullTime
 }
