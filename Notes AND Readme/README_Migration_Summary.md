@@ -61,6 +61,9 @@ Each migration includes:
 
 ## 💻 Common Migration Commands
 
+create two migration file : migrate create -ext sql -dir db/migrations -seq create_users_table
+
+
 | Command | Description |
 |----------|--------------|
 | `migrate -path "DB/Migration" -database "<DB_URL>" up` | Apply all pending migrations |
