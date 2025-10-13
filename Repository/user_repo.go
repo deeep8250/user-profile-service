@@ -1,12 +1,13 @@
 package repository
 
 import (
-	"context"
-	Db "profiles/internal/db"
+	"profiles/models"
+
+	"gorm.io/gorm"
 )
 
 type UserRepository struct {
-	q *Db.Queries
+	q *gorm.DB
 }
 
 // NOTE:
@@ -17,15 +18,25 @@ type UserRepository struct {
 // Even though we don’t write "UserRepository{...}" in main.go,
 // this function does it internally and gives us that ready-to-use object.
 
-func NewUserRepo(q *Db.Queries) *UserRepository {
+func NewUserRepo(q *gorm.DB) *UserRepository {
 
 	return &UserRepository{q: q}
 }
 
-func (r *UserRepository) CreateUser(ctx context.Context, arg Db.CreateUserParams) (Db.User, error) {
-	return r.q.CreateUser(ctx, arg)
+func (r *UserRepository) CreateUser(arg models.User) error {
+	return r.q.Create(arg).Error
 }
 
-func (r *UserRepository) GetUser(ctx context.Context, id int64) (Db.User, error) {
-	return r.q.GetUserByIdNew(ctx, id)
+func (r *UserRepository) GetUser(email string) (*models.User, error) {
+	var User models.User
+	result := r.q.Preload("Profiles").Where("id=?", email).First(&User)
+	return &User, result.Error
+
 }
+
+// func (r *UserRepository) Update(id int64) error {
+// var User models.
+
+// }
+
+// func (r *UserRepository) Delete (id int64) error {}

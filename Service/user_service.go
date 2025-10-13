@@ -1,8 +1,9 @@
 package service
 
 import (
+	"fmt"
 	repository "profiles/Repository"
-	Db "profiles/internal/db"
+	"profiles/models"
 )
 
 // this struct is for accessing the repository layer's function with db connection
@@ -22,10 +23,31 @@ func NewUserService(repo *repository.UserRepository) *UserService {
 	return &UserService{r: repo}
 }
 
-func (s *UserService) RegisterUser(user Db.User) {
+func (s *UserService) RegisterUser(user models.User) (string, error) {
+
+	result, err := s.r.GetUser(user.Email)
+	if err != nil {
+		fmt.Println("error : ", err.Error())
+		return "", fmt.Errorf("error: %w", err)
+	}
+
+	if result != nil {
+		fmt.Println("User already exist")
+		return "User already exist", nil
+	}
+
+	err = s.r.CreateUser(user)
+	if err != nil {
+		return "", fmt.Errorf("error : %w", err)
+	}
+	return "User Register successfully", nil
 
 }
 
-func (s *UserService) GetUserByID(userId int64) {
-
+func (s *UserService) GetUserByEmail(email string) (models.User, error) {
+	result, err := s.r.GetUser(email)
+	if err != nil {
+		return models.User{}, err
+	}
+	return *result, nil
 }
