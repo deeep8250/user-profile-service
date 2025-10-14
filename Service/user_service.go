@@ -27,8 +27,8 @@ func (s *UserService) RegisterUser(user models.User) (string, error) {
 
 	result, err := s.r.GetUser(user.Email)
 	if err != nil {
-		fmt.Println("error : ", err.Error())
-		return "", fmt.Errorf("error: %w", err)
+		fmt.Println("error 1: ", err.Error())
+		return "", fmt.Errorf("error 2: %w", err)
 	}
 
 	if result != nil {
@@ -36,9 +36,9 @@ func (s *UserService) RegisterUser(user models.User) (string, error) {
 		return "User already exist", nil
 	}
 
-	err = s.r.CreateUser(user)
+	err = s.r.CreateUser(&user)
 	if err != nil {
-		return "", fmt.Errorf("error : %w", err)
+		return "", fmt.Errorf("error 2 : %w", err)
 	}
 	return "User Register successfully", nil
 

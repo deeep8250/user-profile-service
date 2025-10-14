@@ -1,12 +1,16 @@
 package routes
 
-import "github.com/gin-gonic/gin"
+import (
+	handler "profiles/Handler"
 
-func Routes(c *gin.Engine) {
+	"github.com/gin-gonic/gin"
+)
+
+func Routes(c *gin.Engine, handler *handler.UserHandler) {
 
 	//users
-	c.POST("/create-users")
-	c.GET("/users/:id")
+	c.POST("/create-users", handler.NewUser)
+	c.GET("/users", handler.GetUserByEmail)
 	c.GET("/List-of-users")
 	c.PUT("/update-user")
 	c.DELETE("/delete-user")

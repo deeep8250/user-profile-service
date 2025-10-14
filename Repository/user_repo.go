@@ -1,6 +1,7 @@
 package repository
 
 import (
+	"errors"
 	"profiles/models"
 
 	"gorm.io/gorm"
@@ -23,14 +24,22 @@ func NewUserRepo(q *gorm.DB) *UserRepository {
 	return &UserRepository{q: q}
 }
 
-func (r *UserRepository) CreateUser(arg models.User) error {
+func (r *UserRepository) CreateUser(arg *models.User) error {
 	return r.q.Create(arg).Error
 }
 
 func (r *UserRepository) GetUser(email string) (*models.User, error) {
 	var User models.User
-	result := r.q.Preload("Profiles").Where("id=?", email).First(&User)
-	return &User, result.Error
+	result := r.q.Preload("Profile").Where("email=?", email).First(&User)
+
+	if result.Error != nil {
+		if errors.Is(result.Error, gorm.ErrRecordNotFound) {
+			return nil, nil
+		}
+		return nil, result.Error
+	}
+
+	return &User, nil
 
 }
 
