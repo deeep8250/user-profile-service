@@ -9,16 +9,16 @@ import (
 func Routes(c *gin.Engine, handler *handler.UserHandler) {
 
 	//users
-	c.POST("/create-users", handler.NewUser)
-	c.GET("/users", handler.GetUserByEmail)
-	c.GET("/List-of-users")
-	c.PUT("/update-user")
-	c.DELETE("/delete-user")
+	c.POST("users/create-users", handler.NewUser)
+	c.GET("users/users", handler.GetUserByEmail)
+	c.GET("users/List-of-users", handler.GetAllUsers)
+	c.PUT("users/update-user/:id", handler.UpdateUserHandler)
+	c.DELETE("users/delete-user")
 
 	//Profiles
-	c.POST("/create-profiles")
-	c.GET("/profiles/:id")
-	c.GET("/List-of-profiles")
-	c.PUT("/update-profiles")
-	c.DELETE("/delete-profiles")
+	c.POST("profiles/create-profiles")
+	c.GET("profiles/profiles/:id")
+	c.GET("profiles/List-of-profiles")
+	c.PUT("profiles/update-profiles")
+	c.DELETE("profiles/delete-profiles")
 }

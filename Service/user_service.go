@@ -4,6 +4,8 @@ import (
 	"fmt"
 	repository "profiles/Repository"
 	"profiles/models"
+
+	"golang.org/x/crypto/bcrypt"
 )
 
 // this struct is for accessing the repository layer's function with db connection
@@ -36,6 +38,13 @@ func (s *UserService) RegisterUser(user models.User) (string, error) {
 		return "User already exist", nil
 	}
 
+	hashPass, err := bcrypt.GenerateFromPassword([]byte(user.Password), bcrypt.DefaultCost)
+	if err != nil {
+		return "", fmt.Errorf("password hashing failed")
+	}
+
+	user.Password = string(hashPass)
+
 	err = s.r.CreateUser(&user)
 	if err != nil {
 		return "", fmt.Errorf("error 2 : %w", err)
@@ -50,4 +59,22 @@ func (s *UserService) GetUserByEmail(email string) (models.User, error) {
 		return models.User{}, err
 	}
 	return *result, nil
+}
+
+func (s *UserService) GetAllusers() ([]models.User, error) {
+	result, err := s.r.GetAllUser()
+	if err != nil {
+		return []models.User{}, err
+	}
+
+	return result, nil
+}
+
+func (s *UserService) UpdateUser(id int64, user models.User) (models.User, error) {
+	result, err := s.r.Update(id, user)
+	if err != nil {
+		return models.User{}, err
+	}
+	return result, nil
+
 }

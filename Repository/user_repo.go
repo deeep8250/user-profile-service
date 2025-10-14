@@ -2,6 +2,8 @@ package repository
 
 import (
 	"errors"
+	"fmt"
+
 	"profiles/models"
 
 	"gorm.io/gorm"
@@ -43,9 +45,48 @@ func (r *UserRepository) GetUser(email string) (*models.User, error) {
 
 }
 
-// func (r *UserRepository) Update(id int64) error {
-// var User models.
+func (r *UserRepository) GetAllUser() ([]models.User, error) {
 
-// }
+	var user []models.User
+	result := r.q.Find(&user)
+	if result.Error != nil {
+		return []models.User{}, fmt.Errorf("error from get all users: %w", result.Error)
+	}
+
+	return user, nil
+
+}
+
+func (r *UserRepository) Update(id int64, updates models.User) (models.User, error) {
+	var user2 models.User
+	result := r.q.Preload("Profile").Where("id=?", id).First(&user2)
+	if result.Error != nil {
+		return models.User{}, result.Error
+	}
+	// prevent changing ID or timestamps
+	if updates.CreatedAt != nil {
+		return models.User{}, fmt.Errorf("restricted field in use")
+	}
+	if updates.Deleted != nil {
+		return models.User{}, fmt.Errorf("restricted field in use")
+	}
+	if updates.ID != nil {
+		return models.User{}, fmt.Errorf("restricted field in use")
+	}
+	if updates.UpdatedAt != nil {
+		return models.User{}, fmt.Errorf("restricted field in use")
+	}
+
+	if err := r.q.Model(&user2).Updates(updates).Error; err != nil {
+		return models.User{}, err
+	}
+
+	if err := r.q.Preload("Profile").Where("id=?", id).First(&user2).Error; err != nil {
+		return models.User{}, err
+	}
+
+	return user2, nil
+
+}
 
 // func (r *UserRepository) Delete (id int64) error {}
