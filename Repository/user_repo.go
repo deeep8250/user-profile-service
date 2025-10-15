@@ -3,6 +3,7 @@ package repository
 import (
 	"errors"
 	"fmt"
+	"sort"
 
 	"profiles/models"
 
@@ -45,7 +46,7 @@ func (r *UserRepository) GetUser(email string) (*models.User, error) {
 
 }
 
-func (r *UserRepository) GetAllUser(page int, Limit int) ([]models.User, error) {
+func (r *UserRepository) GetAllUser(page int, Limit int, sort_by, order string) ([]models.User, error) {
 
 	// get the specific rows
 	offset := (page - 1) * Limit
@@ -63,6 +64,15 @@ func (r *UserRepository) GetAllUser(page int, Limit int) ([]models.User, error) 
 		users = append(users, a)
 		fmt.Println(users)
 	}
+
+	// sort_by
+	sort.Slice(users, func(i, j int) bool {
+		if order == "asc" {
+			return users[i].CreatedAt.Before(*users[j].CreatedAt)
+		} else {
+			return users[i].CreatedAt.After(*users[j].CreatedAt)
+		}
+	})
 
 	return users, nil
 
