@@ -74,11 +74,12 @@ func (s *UserHandler) GetAllUsers(c *gin.Context) {
 	pageLimitStr := c.DefaultQuery("page_size", "10")
 	sort_by := c.DefaultQuery("sort_by", "created_at")
 	order := c.DefaultQuery("order", "asc")
+	filter := c.DefaultQuery("name", "")
 
 	page, _ := strconv.Atoi(pageStr)
 	pageLimit, _ := strconv.Atoi(pageLimitStr)
 
-	result, err := s.r.GetAllusers(page, pageLimit, sort_by, order)
+	result, err := s.r.GetAllusers(page, pageLimit, sort_by, order, filter)
 	if err != nil {
 		c.JSON(http.StatusInternalServerError, gin.H{
 			"error": err.Error(),

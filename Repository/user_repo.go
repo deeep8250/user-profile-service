@@ -4,6 +4,7 @@ import (
 	"errors"
 	"fmt"
 	"sort"
+	"strings"
 
 	"profiles/models"
 
@@ -46,7 +47,7 @@ func (r *UserRepository) GetUser(email string) (*models.User, error) {
 
 }
 
-func (r *UserRepository) GetAllUser(page int, Limit int, sort_by, order string) ([]models.User, error) {
+func (r *UserRepository) GetAllUser(page int, Limit int, sort_by, order, filter string) ([]models.User, error) {
 
 	// get the specific rows
 	offset := (page - 1) * Limit
@@ -56,13 +57,13 @@ func (r *UserRepository) GetAllUser(page int, Limit int, sort_by, order string) 
 		return []models.User{}, err
 	}
 	defer rows.Close()
-	fmt.Println("outside  next loop")
+
 	var users []models.User
 	for rows.Next() {
 		var a models.User
 		r.q.ScanRows(rows, &a)
 		users = append(users, a)
-		fmt.Println(users)
+
 	}
 
 	// sort_by
@@ -74,7 +75,15 @@ func (r *UserRepository) GetAllUser(page int, Limit int, sort_by, order string) 
 		}
 	})
 
-	return users, nil
+	//filter
+	var filtered_data []models.User
+	for _, u := range users {
+		if strings.Contains(u.Name, filter) {
+			filtered_data = append(filtered_data, u)
+		}
+	}
+
+	return filtered_data, nil
 
 }
 
