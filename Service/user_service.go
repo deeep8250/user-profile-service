@@ -61,8 +61,8 @@ func (s *UserService) GetUserByEmail(email string) (models.User, error) {
 	return *result, nil
 }
 
-func (s *UserService) GetAllusers() ([]models.User, error) {
-	result, err := s.r.GetAllUser()
+func (s *UserService) GetAllusers(page int, pageLimit int) ([]models.User, error) {
+	result, err := s.r.GetAllUser(page, pageLimit)
 	if err != nil {
 		return []models.User{}, err
 	}

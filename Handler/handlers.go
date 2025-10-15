@@ -70,7 +70,13 @@ func (s *UserHandler) GetUserByEmail(c *gin.Context) {
 }
 func (s *UserHandler) GetAllUsers(c *gin.Context) {
 
-	result, err := s.r.GetAllusers()
+	pageStr := c.DefaultQuery("page", "1")
+	pageLimitStr := c.DefaultQuery("page_size", "10")
+
+	page, _ := strconv.Atoi(pageStr)
+	pageLimit, _ := strconv.Atoi(pageLimitStr)
+
+	result, err := s.r.GetAllusers(page, pageLimit)
 	if err != nil {
 		c.JSON(http.StatusInternalServerError, gin.H{
 			"error": err.Error(),

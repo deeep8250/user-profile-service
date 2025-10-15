@@ -45,15 +45,26 @@ func (r *UserRepository) GetUser(email string) (*models.User, error) {
 
 }
 
-func (r *UserRepository) GetAllUser() ([]models.User, error) {
+func (r *UserRepository) GetAllUser(page int, Limit int) ([]models.User, error) {
 
-	var user []models.User
-	result := r.q.Find(&user)
-	if result.Error != nil {
-		return []models.User{}, fmt.Errorf("error from get all users: %w", result.Error)
+	// get the specific rows
+	offset := (page - 1) * Limit
+	fmt.Printf("limit : %d and offset : %d", Limit, offset)
+	rows, err := r.q.Raw("SELECT  * from users LIMIT $1 OFFSET $2", Limit, offset).Rows()
+	if err != nil {
+		return []models.User{}, err
+	}
+	defer rows.Close()
+	fmt.Println("outside  next loop")
+	var users []models.User
+	for rows.Next() {
+		var a models.User
+		r.q.ScanRows(rows, &a)
+		users = append(users, a)
+		fmt.Println(users)
 	}
 
-	return user, nil
+	return users, nil
 
 }
 
