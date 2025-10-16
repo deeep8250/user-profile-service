@@ -1,6 +1,7 @@
 package handler
 
 import (
+	"fmt"
 	"net/http"
 	service "profiles/Service"
 	"profiles/models"
@@ -12,6 +13,12 @@ import (
 type UserHandler struct {
 	r *service.UserService
 }
+
+func (s *UserHandler) NewProfileHandler(profileService *service.ProfileService) any {
+	panic("unimplemented")
+}
+
+/// For User
 
 func NewUserHandler(service *service.UserService) *UserHandler {
 	return &UserHandler{r: service}
@@ -70,6 +77,8 @@ func (s *UserHandler) GetUserByEmail(c *gin.Context) {
 }
 func (s *UserHandler) GetAllUsers(c *gin.Context) {
 
+	fmt.Println("enter into the get all  user handler")
+
 	pageStr := c.DefaultQuery("page", "1")
 	pageLimitStr := c.DefaultQuery("page_size", "10")
 	sort_by := c.DefaultQuery("sort_by", "created_at")
@@ -120,6 +129,31 @@ func (s *UserHandler) UpdateUserHandler(c *gin.Context) {
 
 	c.JSON(http.StatusOK, gin.H{
 		"response": result,
+	})
+
+}
+
+func (s *UserHandler) SoftDelete(c *gin.Context) {
+	fmt.Println("enter into delete handler ")
+	id := c.DefaultQuery("id", "")
+	idInt, err := strconv.Atoi(id)
+	if err != nil {
+		c.JSON(http.StatusBadRequest, gin.H{
+			"error": err.Error(),
+		})
+		return
+	}
+	fmt.Println("enter into handler ")
+	result, err := s.r.DeleteUser(idInt)
+	if err != nil {
+		c.JSON(http.StatusInternalServerError, gin.H{
+			"error": err.Error(),
+		})
+		return
+	}
+
+	c.JSON(http.StatusOK, gin.H{
+		"result": result,
 	})
 
 }

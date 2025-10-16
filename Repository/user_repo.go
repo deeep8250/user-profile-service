@@ -36,7 +36,10 @@ func (r *UserRepository) GetUser(email string) (*models.User, error) {
 	var User models.User
 	result := r.q.Preload("Profile").Where("email=?", email).First(&User)
 
-	if result.Error != nil {
+	if result.Error != nil || User.Deleted {
+		if User.Deleted {
+			return &models.User{}, fmt.Errorf("user is already deleted")
+		}
 		if errors.Is(result.Error, gorm.ErrRecordNotFound) {
 			return nil, nil
 		}
@@ -52,7 +55,7 @@ func (r *UserRepository) GetAllUser(page int, Limit int, sort_by, order, filter 
 	// get the specific rows
 	offset := (page - 1) * Limit
 	fmt.Printf("limit : %d and offset : %d", Limit, offset)
-	rows, err := r.q.Raw("SELECT  * from users LIMIT $1 OFFSET $2", Limit, offset).Rows()
+	rows, err := r.q.Raw("SELECT  * from users Where Deleted=false LIMIT $1 OFFSET $2", Limit, offset).Rows()
 	if err != nil {
 		return []models.User{}, err
 	}
@@ -90,14 +93,17 @@ func (r *UserRepository) GetAllUser(page int, Limit int, sort_by, order, filter 
 func (r *UserRepository) Update(id int64, updates models.User) (models.User, error) {
 	var user2 models.User
 	result := r.q.Preload("Profile").Where("id=?", id).First(&user2)
-	if result.Error != nil {
+	if result.Error != nil || user2.Deleted {
+		if user2.Deleted {
+			return models.User{}, fmt.Errorf("invalid user")
+		}
 		return models.User{}, result.Error
 	}
 	// prevent changing ID or timestamps
 	if updates.CreatedAt != nil {
 		return models.User{}, fmt.Errorf("restricted field in use")
 	}
-	if updates.Deleted != nil {
+	if updates.Deleted {
 		return models.User{}, fmt.Errorf("restricted field in use")
 	}
 	if updates.ID != nil {
@@ -119,4 +125,22 @@ func (r *UserRepository) Update(id int64, updates models.User) (models.User, err
 
 }
 
-// func (r *UserRepository) Delete (id int64) error {}
+func (r *UserRepository) Delete(id int) (models.User, error) {
+	fmt.Println("enter into the repo")
+	var user models.User
+	result := r.q.Where("id=?", id).First(&user)
+	if result.Error != nil || user.Deleted {
+		if user.Deleted {
+			return models.User{}, fmt.Errorf("user already deleted")
+		}
+		fmt.Println("enter into the  if state")
+		return models.User{}, result.Error
+
+	}
+
+	fmt.Println("result : ", result)
+
+	user.Deleted = true
+	r.q.Save(&user)
+	return user, nil
+}

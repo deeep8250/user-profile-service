@@ -62,6 +62,7 @@ func (s *UserService) GetUserByEmail(email string) (models.User, error) {
 }
 
 func (s *UserService) GetAllusers(page int, pageLimit int, sort_by string, order, filter string) ([]models.User, error) {
+
 	result, err := s.r.GetAllUser(page, pageLimit, sort_by, order, filter)
 	if err != nil {
 		return []models.User{}, err
@@ -77,4 +78,13 @@ func (s *UserService) UpdateUser(id int64, user models.User) (models.User, error
 	}
 	return result, nil
 
+}
+
+func (s *UserService) DeleteUser(id int) (models.User, error) {
+	fmt.Println("enter into the service")
+	result, err := s.r.Delete(id)
+	if err != nil {
+		return models.User{}, err
+	}
+	return result, nil
 }

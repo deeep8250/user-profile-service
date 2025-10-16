@@ -25,8 +25,12 @@ func main() {
 	userService := service.NewUserService(userRepo)
 	handler := handler.NewUserHandler(userService)
 
+	profileRepo := repository.NewProfileRepo(db.DB)
+	profileService := service.NewProfileService(profileRepo)
+	Profilehandler := handler.NewProfileHandler(profileService)
+
 	r := gin.Default()
-	routes.Routes(r, handler)
+	routes.Routes(r, handler, Profilehandler)
 
 	r.Run(":8080")
 
