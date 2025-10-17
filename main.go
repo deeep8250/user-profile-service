@@ -3,9 +3,10 @@ package main
 import (
 	"log"
 	db "profiles/Db"
-	handler "profiles/Handler"
+
 	repository "profiles/Repository"
 	service "profiles/Service"
+	handler "profiles/handler"
 	"profiles/routes"
 
 	"github.com/gin-gonic/gin"
@@ -23,14 +24,13 @@ func main() {
 
 	userRepo := repository.NewUserRepo(db.DB)
 	userService := service.NewUserService(userRepo)
-	handler := handler.NewUserHandler(userService)
+	handler2 := handler.NewUserHandler(userService)
 
 	profileRepo := repository.NewProfileRepo(db.DB)
 	profileService := service.NewProfileService(profileRepo)
 	Profilehandler := handler.NewProfileHandler(profileService)
-
 	r := gin.Default()
-	routes.Routes(r, handler, Profilehandler)
+	routes.Routes(r, handler2, Profilehandler)
 
 	r.Run(":8080")
 

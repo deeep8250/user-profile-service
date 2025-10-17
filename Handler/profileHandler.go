@@ -20,31 +20,6 @@ func NewProfileHandler(service *service.ProfileService) *ProfileHandler {
 	return &ProfileHandler{r: service}
 }
 
-// func (r *ProfileHandler) NewProfile(c *gin.Context) {
-
-// 	var user models.Profile
-// 	err := c.ShouldBindJSON(&user)
-// 	if err != nil {
-// 		c.JSON(http.StatusBadRequest, gin.H{
-// 			"response": "invalid request",
-// 		})
-// 		return
-// 	}
-
-// 	result, err := r.r.Registerpr(user)
-// 	if err != nil {
-// 		c.JSON(http.StatusBadRequest, gin.H{
-// 			"error": err.Error(),
-// 		})
-// 		return
-// 	}
-
-// 	c.JSON(http.StatusOK, gin.H{
-// 		"response": result,
-// 	})
-
-// }
-
 func (r *ProfileHandler) GetProfileByEmail(c *gin.Context) {
 	type User struct {
 		Email string `json:"email" binding:"required,email"`

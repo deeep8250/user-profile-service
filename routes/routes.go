@@ -1,7 +1,7 @@
 package routes
 
 import (
-	handler "profiles/Handler"
+	"profiles/handler"
 
 	"github.com/gin-gonic/gin"
 )
@@ -16,9 +16,9 @@ func Routes(c *gin.Engine, handler *handler.UserHandler, profileHandler *handler
 	c.DELETE("users/delete-user", handler.SoftDelete)
 
 	//Profiles
-	c.POST("profiles/create-profiles")
-	c.GET("profiles/profiles/:id")
-	c.GET("profiles/List-of-profiles")
-	c.PUT("profiles/update-profiles")
-	c.DELETE("profiles/delete-profiles")
+	// c.POST("profiles/create-profiles",profileHandler.)
+	c.GET("profiles/Getprofiles", profileHandler.GetProfileByEmail)
+	// c.GET("profiles/List-of-profiles", profileHandler)
+	c.PUT("profiles/update-profiles", profileHandler.UpdateProfileHandler)
+	c.DELETE("profiles/delete-profiles", profileHandler.SoftDelete)
 }

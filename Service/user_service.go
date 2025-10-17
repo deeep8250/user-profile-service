@@ -25,7 +25,7 @@ func NewUserService(repo *repository.UserRepository) *UserService {
 	return &UserService{r: repo}
 }
 
-func (s *UserService) RegisterUser(user models.User) (string, error) {
+func (s *UserService) RegisterUser(user *models.User) (string, error) {
 
 	result, err := s.r.GetUser(user.Email)
 	if err != nil {
@@ -45,7 +45,7 @@ func (s *UserService) RegisterUser(user models.User) (string, error) {
 
 	user.Password = string(hashPass)
 
-	err = s.r.CreateUser(&user)
+	err = s.r.CreateUser(user)
 	if err != nil {
 		return "", fmt.Errorf("error 2 : %w", err)
 	}
@@ -58,6 +58,10 @@ func (s *UserService) GetUserByEmail(email string) (models.User, error) {
 	if err != nil {
 		return models.User{}, err
 	}
+	if result == nil {
+		return models.User{}, fmt.Errorf("no result found")
+	}
+	fmt.Println("service layer email :", result)
 	return *result, nil
 }
 

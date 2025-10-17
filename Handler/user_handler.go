@@ -14,10 +14,6 @@ type UserHandler struct {
 	r *service.UserService
 }
 
-func (s *UserHandler) NewProfileHandler(profileService *service.ProfileService) any {
-	panic("unimplemented")
-}
-
 /// For User
 
 func NewUserHandler(service *service.UserService) *UserHandler {
@@ -35,7 +31,7 @@ func (s *UserHandler) NewUser(c *gin.Context) {
 		return
 	}
 
-	result, err := s.r.RegisterUser(user)
+	result, err := s.r.RegisterUser(&user)
 	if err != nil {
 		c.JSON(http.StatusBadRequest, gin.H{
 			"error": err.Error(),

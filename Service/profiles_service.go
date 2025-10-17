@@ -22,9 +22,15 @@ func NewProfileService(repo *repository.ProfilesRepository) *ProfileService {
 	return &ProfileService{r: repo}
 }
 
-// func (s *ProfileService) RegisterUser(email string) (string, error) {
+func (s *ProfileService) RegisterProfile(profile models.Profile) (string, error) {
+	err := s.r.CreateProfile(&profile)
+	if err != nil {
+		return "", err
+	}
 
-// }
+	return "user  profile has been created", nil
+
+}
 
 func (s *ProfileService) GetProfileByEmail(email string) (models.Profile, error) {
 	result, err := s.r.GetPrfile(email)

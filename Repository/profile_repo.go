@@ -26,7 +26,17 @@ func NewProfileRepo(q *gorm.DB) *ProfilesRepository {
 }
 
 func (r *ProfilesRepository) CreateProfile(arg *models.Profile) error {
-	return r.q.Create(arg).Error
+	var user models.User
+	result := r.q.Where("id=?", arg.UserID).First(&user)
+	if result.Error != nil {
+		return result.Error
+	}
+	user.Profile = arg
+	result2 := r.q.Save(&user)
+	if result2 != nil {
+		return result2.Error
+	}
+	return nil
 }
 
 func (r *ProfilesRepository) GetPrfile(email string) (*models.Profile, error) {
@@ -103,7 +113,7 @@ func (r *ProfilesRepository) UpdateProfiles(id int64, updates models.Profile) (m
 	if updates.Deleted {
 		return models.Profile{}, fmt.Errorf("restricted field in use")
 	}
-	if updates.ID != nil {
+	if updates.ID != 0 {
 		return models.Profile{}, fmt.Errorf("restricted field in use")
 	}
 	if updates.UpdatedAt != nil {

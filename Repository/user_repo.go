@@ -29,10 +29,44 @@ func NewUserRepo(q *gorm.DB) *UserRepository {
 }
 
 func (r *UserRepository) CreateUser(arg *models.User) error {
-	return r.q.Create(arg).Error
+
+	tx := r.q.Begin()
+	fmt.Println("→ Transaction started")
+
+	// 1️⃣ Insert user
+	if err := tx.Create(arg).Error; err != nil {
+		fmt.Println("❌ user insert failed:", err)
+		tx.Rollback()
+		return err
+	}
+	fmt.Println("✅ user inserted, ID:", arg.ID)
+
+	// 2️⃣ Insert related profile
+	profile := models.Profile{UserID: arg.ID}
+	if err := tx.Create(&profile).Error; err != nil {
+		fmt.Println("❌ profile insert failed:", err)
+		tx.Rollback()
+		return err
+	}
+
+	// 3️⃣ Commit
+	if err := tx.Commit().Error; err != nil {
+		fmt.Println("❌ commit failed:", err)
+		return err
+	}
+	fmt.Println("✅ Transaction committed successfully")
+	return nil
+
+	// if err := r.q.Create(arg).Error; err != nil {
+	// 	fmt.Println("❌ insert failed:", err)
+	// }
+	// fmt.Println("✅ inserted ID:", arg.ID)
+	// return nil
+
 }
 
 func (r *UserRepository) GetUser(email string) (*models.User, error) {
+	fmt.Println("entered in to repo")
 	var User models.User
 	result := r.q.Preload("Profile").Where("email=?", email).First(&User)
 
@@ -45,7 +79,7 @@ func (r *UserRepository) GetUser(email string) (*models.User, error) {
 		}
 		return nil, result.Error
 	}
-
+	fmt.Println("user  is ", User)
 	return &User, nil
 
 }
@@ -106,7 +140,7 @@ func (r *UserRepository) Update(id int64, updates models.User) (models.User, err
 	if updates.Deleted {
 		return models.User{}, fmt.Errorf("restricted field in use")
 	}
-	if updates.ID != nil {
+	if updates.ID != 0 {
 		return models.User{}, fmt.Errorf("restricted field in use")
 	}
 	if updates.UpdatedAt != nil {
