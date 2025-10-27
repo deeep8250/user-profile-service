@@ -50,8 +50,8 @@ func (s *ProfileService) GetProfileByEmail(email string) (models.Profile, error)
 // 	return result, nil
 // }
 
-func (s *ProfileService) UpdateProfile(id int64, user models.Profile) (models.Profile, error) {
-	result, err := s.r.UpdateProfiles(id, user)
+func (s *ProfileService) UpdateProfile(id int64, userProfile models.Profile) (models.Profile, error) {
+	result, err := s.r.UpdateProfiles(id, userProfile)
 	if err != nil {
 		return models.Profile{}, err
 	}

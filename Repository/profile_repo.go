@@ -98,16 +98,22 @@ func (r *ProfilesRepository) GetPrfile(email string) (*models.Profile, error) {
 // }
 
 func (r *ProfilesRepository) UpdateProfiles(id int64, updates models.Profile) (models.Profile, error) {
-	var user2 models.Profile
+	var user2 models.User
+
 	result := r.q.Preload("Profile").Where("id=?", id).First(&user2)
+	fmt.Println("user with profiles : ", user2)
 	if result.Error != nil || user2.Deleted {
 		if user2.Deleted {
 			return models.Profile{}, fmt.Errorf("invalid user")
 		}
 		return models.Profile{}, result.Error
 	}
+
+	if user2.Profile == nil {
+		return models.Profile{}, fmt.Errorf("profile is empty for this profile")
+	}
 	// prevent changing ID or timestamps
-	if updates.CreatedAt.IsZero() {
+	if !updates.CreatedAt.IsZero() {
 		return models.Profile{}, fmt.Errorf("restricted field in use")
 	}
 	if updates.Deleted {
@@ -119,16 +125,25 @@ func (r *ProfilesRepository) UpdateProfiles(id int64, updates models.Profile) (m
 	if updates.UpdatedAt != nil {
 		return models.Profile{}, fmt.Errorf("restricted field in use")
 	}
+	fmt.Println("here it comes")
 
-	if err := r.q.Model(&user2).Updates(updates).Error; err != nil {
+	userProfileId := user2.Profile.ID
+
+	var userProfile models.Profile
+	result2 := r.q.Where("id=?", userProfileId).First(&userProfile)
+	if result2.Error != nil {
+		return models.Profile{}, result2.Error
+	}
+
+	if err := r.q.Model(&userProfile).Updates(&updates).Error; err != nil {
 		return models.Profile{}, err
 	}
 
 	if err := r.q.Preload("Profile").Where("id=?", id).First(&user2).Error; err != nil {
-		return models.Profile{}, err
+		return models.Profile{}, fmt.Errorf("error : %w ", err)
 	}
 
-	return user2, nil
+	return userProfile, nil
 
 }
 

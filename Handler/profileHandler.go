@@ -47,33 +47,8 @@ func (r *ProfileHandler) GetProfileByEmail(c *gin.Context) {
 
 }
 
-// func (s *ProfileHandler) GetAllProfiles(c *gin.Context) {
-
-// 	fmt.Println("enter into the get all  user handler")
-
-// 	pageStr := c.DefaultQuery("page", "1")
-// 	pageLimitStr := c.DefaultQuery("page_size", "10")
-// 	sort_by := c.DefaultQuery("sort_by", "created_at")
-// 	order := c.DefaultQuery("order", "asc")
-// 	filter := c.DefaultQuery("name", "")
-
-// 	page, _ := strconv.Atoi(pageStr)
-// 	pageLimit, _ := strconv.Atoi(pageLimitStr)
-
-// 	result, err := s.r.(page, pageLimit, sort_by, order, filter)
-// 	if err != nil {
-// 		c.JSON(http.StatusInternalServerError, gin.H{
-// 			"error": err.Error(),
-// 		})
-// 		return
-// 	}
-// 	c.JSON(http.StatusOK, gin.H{
-// 		"response": result,
-// 	})
-// }
-
 func (r *ProfileHandler) UpdateProfileHandler(c *gin.Context) {
-	id := c.Param("id")
+	id := c.Query("user_id")
 	idInt, err := strconv.ParseInt(id, 10, 64)
 	if err != nil {
 		c.JSON(http.StatusBadRequest, gin.H{

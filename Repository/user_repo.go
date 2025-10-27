@@ -93,13 +93,16 @@ func (r *UserRepository) GetAllUser(page int, Limit int, sort_by, order, filter 
 	if err != nil {
 		return []models.User{}, err
 	}
+
 	defer rows.Close()
 
 	var users []models.User
 	for rows.Next() {
 		var a models.User
+		var b models.User
 		r.q.ScanRows(rows, &a)
-		users = append(users, a)
+		r.q.Preload("Profile").Where("id=?", a.ID).First(&b)
+		users = append(users, b)
 
 	}
 
@@ -162,7 +165,7 @@ func (r *UserRepository) Update(id int64, updates models.User) (models.User, err
 func (r *UserRepository) Delete(id int) (models.User, error) {
 	fmt.Println("enter into the repo")
 	var user models.User
-	result := r.q.Where("id=?", id).First(&user)
+	result := r.q.Preload("Profile").Where("id=?", id).First(&user)
 	if result.Error != nil || user.Deleted {
 		if user.Deleted {
 			return models.User{}, fmt.Errorf("user already deleted")
@@ -175,6 +178,7 @@ func (r *UserRepository) Delete(id int) (models.User, error) {
 	fmt.Println("result : ", result)
 
 	user.Deleted = true
+	user.Profile.Deleted = true
 	r.q.Save(&user)
 	return user, nil
 }
